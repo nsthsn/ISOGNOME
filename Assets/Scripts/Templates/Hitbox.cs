@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// SRP : Changes player state based off commands from outside controllers.
-/// </summary>
-public class 2DPlayerController : MonoBehaviour
+public class Hitbox : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()

@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// SRP: Changes player state based off input from outside controllers
-/// </summary>
-public class 3DPlayerController : MonoBehaviour
+public class PlatformBody : Body
 {
     // Start is called before the first frame update
     void Start()
@@ -17,5 +14,17 @@ public class 3DPlayerController : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public override bool IsGrounded() {
+        bool rtn = false;
+
+        return rtn;
+    }
+    public override void Jump() {
+
+    }
+    public override void Move(Vector2 direction) {
+
     }
 }
