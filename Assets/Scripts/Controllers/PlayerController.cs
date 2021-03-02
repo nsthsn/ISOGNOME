@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     };
 
     StateMachine<PlayerState> _playerState = new StateMachine<PlayerState>();
+    Body _body;
 
     // Start is called before the first frame update
     void Start()
@@ -27,12 +28,18 @@ public class PlayerController : MonoBehaviour
         _playerState.AddState(PlayerState.Idle, null, null, null);
         _playerState.AddState(PlayerState.Move, null, null, null);
         _playerState.AddState(PlayerState.Jump, null, null, null);
+
+        _body = GetComponent<Body>();
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    private void FixedUpdate() {
+        _body.DoGravity();
     }
 
     bool CheckCanChangeState(PlayerState nextState) {
