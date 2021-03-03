@@ -42,7 +42,7 @@ public class PlatformBody : Body
         _rb2d = GetComponent<Rigidbody2D>();
     }
     void Start() {
-        int layerMask = LayerMask.NameToLayer("Terrain");
+        int layerMask = Physics2D.GetLayerCollisionMask(gameObject.layer);
 
         _contactFilter.useTriggers = false;
         _contactFilter.SetLayerMask(layerMask);
@@ -70,8 +70,8 @@ public class PlatformBody : Body
         }
 
         float moveStep = ((_velocity + Vector2.up * _currentGravity * Time.deltaTime * 0.5f) * Time.deltaTime).y;
-        
-        _velocity.y += moveStep * Time.deltaTime;
+
+        _velocity.y += moveStep;
         _grounded = false;
 
         DoMovement(_velocity, true);
@@ -79,11 +79,10 @@ public class PlatformBody : Body
 
     void DoMovement(Vector2 move, bool moveY) {
         float distance = move.magnitude;
-
+        
         if(distance >= _minMoveDistance) {
             int count = _rb2d.Cast(move, _contactFilter, _hitBuffer, distance + _shellRadius);
             _hitBufferList.Clear();
-
             for (int i = 0; i <count; i++) {
                 _hitBufferList.Add(_hitBuffer[i]);
 
@@ -91,8 +90,10 @@ public class PlatformBody : Body
 
                 // is this the ground or a wall?
                 // this will not handle sliding down slopes as is
-                if(currentNormal.y < minGroundNormalY) {
+                Debug.Log(currentNormal);
+                if(currentNormal.y > minGroundNormalY) {
                     _grounded = true;
+                    Debug.Log(_grounded);
                     if(moveY) {
                         _groundNormal = currentNormal;
                         currentNormal.x = 0;
@@ -114,10 +115,11 @@ public class PlatformBody : Body
             }
 
             if(count > 0) {
-                Debug.Log(count);
+                //Debug.Log(count);
             }
         }
 
         _rb2d.position = _rb2d.position + move.normalized * distance;
+        
     }
 }

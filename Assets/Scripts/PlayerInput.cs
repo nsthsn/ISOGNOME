@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class PlayerInput : MonoBehaviour
 {
+    Body _playerBody;
     // Start is called before the first frame update
     void Start()
     {
