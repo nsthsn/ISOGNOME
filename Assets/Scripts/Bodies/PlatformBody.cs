@@ -4,30 +4,52 @@ using UnityEngine;
 
 public class PlatformBody : Body
 {
-    public float minGroundNormalY = .65f;
 
-    protected Vector2 _velocity = Vector2.zero;
-    protected Rigidbody2D _rb2d;
 
+    // collision levers
     protected float _minMoveDistance = .001f;
     protected float _shellRadius = .01f;
-    protected bool _grounded = false;
-    protected Vector2 _groundNormal;
+    protected float minGroundNormalY = .65f;
 
+    // jump levers
+    float _jumpHeight = 3.25f;
+    float _timeToJumpHeight = .5f;
+    float _timeToFall = .353f;
+
+    // move levers
+
+    // control variables
+    protected Vector2 _velocity = Vector2.zero;
+    protected Rigidbody2D _rb2d;
+    protected bool _grounded = false;
+
+    // collision variables
     protected ContactFilter2D _contactFilter;
     protected RaycastHit2D[] _hitBuffer = new RaycastHit2D[16];
     protected List<RaycastHit2D> _hitBufferList = new List<RaycastHit2D>(16);
+    protected Vector2 _groundNormal;
+
+    // jump variables
+    float _jumpVelocity = 0;
+    float _currentGravity = 0;
+    float _baseGravity = 0;
+    float _downGravity = 0;
+
+    // 
 
     void OnEnable()
     {
         _rb2d = GetComponent<Rigidbody2D>();
     }
-    void OnStart() {
+    void Start() {
         int layerMask = LayerMask.NameToLayer("Terrain");
 
         _contactFilter.useTriggers = false;
         _contactFilter.SetLayerMask(layerMask);
         _contactFilter.useLayerMask = true;
+
+        _baseGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToJumpHeight, 2);
+        _downGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToFall, 2);
     }
     public override bool IsGrounded() {
         bool rtn = false;
@@ -40,10 +62,16 @@ public class PlatformBody : Body
     public override void Move(Vector2 direction) {
 
     }
-
     public override void DoGravity() {
+        _currentGravity = _baseGravity;
 
-        _velocity += Physics2D.gravity * Time.deltaTime;
+        if(_velocity.y <= 0) {
+            _currentGravity = _downGravity;
+        }
+
+        float moveStep = ((_velocity + Vector2.up * _currentGravity * Time.deltaTime * 0.5f) * Time.deltaTime).y;
+        
+        _velocity.y += moveStep * Time.deltaTime;
         _grounded = false;
 
         DoMovement(_velocity, true);

@@ -25,11 +25,13 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _body = GetComponent<Body>();
+
         _playerState.AddState(PlayerState.Idle, null, null, null);
         _playerState.AddState(PlayerState.Move, null, null, null);
-        _playerState.AddState(PlayerState.Jump, null, null, null);
+        _playerState.AddState(PlayerState.Jump, JumpEnter, JumpStay, JumpExit);
 
-        _body = GetComponent<Body>();
+        _playerState.CurrentState = PlayerState.Idle;
     }
 
     // Update is called once per frame
@@ -38,11 +40,11 @@ public class PlayerController : MonoBehaviour
         
     }
 
-    private void FixedUpdate() {
+    void FixedUpdate() {
         _body.DoGravity();
     }
 
-    bool CheckCanChangeState(PlayerState nextState) {
+    bool CanChangeState(PlayerState nextState) {
         bool rtn = false;
 
         switch(nextState) {
@@ -51,9 +53,29 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Move:
                 break;
             case PlayerState.Jump:
+                if(_playerState.CurrentState != PlayerState.Jump) {
+                    rtn = true;
+                }
                 break;
         }
 
         return rtn;
     }
+
+    public void TryStateChange(PlayerState tryState) {
+        if(CanChangeState(tryState)) {
+            _playerState.CurrentState = tryState;
+        }
+    }
+
+    void JumpEnter() {
+        _body.Jump();
+    }
+    void JumpStay() {
+
+    }
+    void JumpExit() { 
+    
+    }
+
 }
