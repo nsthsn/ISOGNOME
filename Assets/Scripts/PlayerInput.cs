@@ -7,18 +7,18 @@ using UnityEngine;
 /// </summary>
 public class PlayerInput : MonoBehaviour
 {
-    Body _playerBody;
+    PlayerController _playerController;
     // Start is called before the first frame update
     void Start()
     {
-        
+        _playerController = GetComponent<PlayerController>();
     }
 
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKey(KeyCode.Space)) {
-
+            _playerController.TryStateChange(PlayerController.PlayerState.Jump);
         }
     }
 }

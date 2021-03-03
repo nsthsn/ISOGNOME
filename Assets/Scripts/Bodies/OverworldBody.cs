@@ -13,12 +13,6 @@ public class OverworldBody : Body
     void Update() {
 
     }
-
-    public override bool IsGrounded() {
-        bool rtn = false;
-
-        return rtn;
-    }
     public override void Jump() {
 
     }

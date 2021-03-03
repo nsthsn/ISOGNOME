@@ -42,6 +42,8 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate() {
         _body.DoGravity();
+
+        _playerState.Update();
     }
 
     bool CanChangeState(PlayerState nextState) {
@@ -72,7 +74,9 @@ public class PlayerController : MonoBehaviour
         _body.Jump();
     }
     void JumpStay() {
-
+        if(_body.Grounded) {
+            _playerState.CurrentState = PlayerState.Idle;
+        }
     }
     void JumpExit() { 
     

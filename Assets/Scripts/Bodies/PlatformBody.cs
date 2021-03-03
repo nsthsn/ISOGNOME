@@ -4,24 +4,21 @@ using UnityEngine;
 
 public class PlatformBody : Body
 {
-
-
     // collision levers
     protected float _minMoveDistance = .001f;
     protected float _shellRadius = .01f;
     protected float minGroundNormalY = .65f;
 
     // jump levers
-    float _jumpHeight = 3.25f;
+    float _jumpHeight = 2f;
     float _timeToJumpHeight = .5f;
-    float _timeToFall = .353f;
+    float _timeToFall = .1f;
 
     // move levers
 
     // control variables
     protected Vector2 _velocity = Vector2.zero;
     protected Rigidbody2D _rb2d;
-    protected bool _grounded = false;
 
     // collision variables
     protected ContactFilter2D _contactFilter;
@@ -51,13 +48,10 @@ public class PlatformBody : Body
         _baseGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToJumpHeight, 2);
         _downGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToFall, 2);
     }
-    public override bool IsGrounded() {
-        bool rtn = false;
-
-        return rtn;
-    }
     public override void Jump() {
-
+        _jumpVelocity = Mathf.Abs(_currentGravity) * _timeToJumpHeight;
+        //Debug.Log(_jumpVelocity);
+        _velocity.y = _jumpVelocity;
     }
     public override void Move(Vector2 direction) {
 
@@ -65,16 +59,16 @@ public class PlatformBody : Body
     public override void DoGravity() {
         _currentGravity = _baseGravity;
 
-        if(_velocity.y <= 0) {
+        if(_velocity.y < 0 && !_grounded) {
             _currentGravity = _downGravity;
         }
 
-        float moveStep = ((_velocity + Vector2.up * _currentGravity * Time.deltaTime * 0.5f) * Time.deltaTime).y;
+        Vector2 moveStep = ((_velocity + Vector2.up * _currentGravity * Time.deltaTime * 0.5f) * Time.deltaTime);
 
-        _velocity.y += moveStep;
         _grounded = false;
+        DoMovement(moveStep, true);
 
-        DoMovement(_velocity, true);
+        _velocity.y += _currentGravity * Time.deltaTime; 
     }
 
     void DoMovement(Vector2 move, bool moveY) {
@@ -90,10 +84,8 @@ public class PlatformBody : Body
 
                 // is this the ground or a wall?
                 // this will not handle sliding down slopes as is
-                Debug.Log(currentNormal);
                 if(currentNormal.y > minGroundNormalY) {
                     _grounded = true;
-                    Debug.Log(_grounded);
                     if(moveY) {
                         _groundNormal = currentNormal;
                         currentNormal.x = 0;

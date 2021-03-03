@@ -7,7 +7,10 @@ using UnityEngine;
 /// </summary>
 public abstract class Body : MonoBehaviour
 {
-    public abstract bool IsGrounded();
+    protected bool _grounded = false;
+    public bool Grounded {get{ return _grounded; }}
+
+
     public abstract void Jump();
     public abstract void Move(Vector2 direction);
     public abstract void DoGravity();
