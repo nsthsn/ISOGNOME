@@ -22,27 +22,20 @@ public class PlayerController : MonoBehaviour
     StateMachine<PlayerState> _playerState = new StateMachine<PlayerState>();
     Body _body;
 
+    Vector2 _moveInput;
+
     // Start is called before the first frame update
     void Start()
     {
         _body = GetComponent<Body>();
 
-        _playerState.AddState(PlayerState.Idle, null, null, null);
-        _playerState.AddState(PlayerState.Move, null, null, null);
-        _playerState.AddState(PlayerState.Jump, JumpEnter, JumpStay, JumpExit);
+        _playerState.AddState(PlayerState.Idle, null, IdleUpdate, null);
+        _playerState.AddState(PlayerState.Move, MoveStart, MoveUpdate, MoveStop);
+        _playerState.AddState(PlayerState.Jump, JumpStart, JumpUpdate, JumpStop);
 
         _playerState.CurrentState = PlayerState.Idle;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     void FixedUpdate() {
-        _body.DoGravity();
-
         _playerState.Update();
     }
 
@@ -63,23 +56,47 @@ public class PlayerController : MonoBehaviour
 
         return rtn;
     }
-
-    public void TryStateChange(PlayerState tryState) {
+    public void TryStateChange(PlayerState tryState, Vector2? data = null) {
+        if(data != null) {
+            // null coalescing operator
+            _moveInput = data ?? Vector2.zero;
+        }
         if(CanChangeState(tryState)) {
             _playerState.CurrentState = tryState;
         }
     }
+    // MovementUpdate
+    void PhysicsUpdate() {
+        _body.DoGravity();
+        _body.Move(_moveInput);
+    }
 
-    void JumpEnter() {
+    //PlayerState.Idle
+    void IdleUpdate() {
+        PhysicsUpdate();
+    }
+
+    // PlayerState.Jump
+    void JumpStart() {
         _body.Jump();
     }
-    void JumpStay() {
+    void JumpUpdate() {
         if(_body.Grounded) {
             _playerState.CurrentState = PlayerState.Idle;
         }
+        PhysicsUpdate();
     }
-    void JumpExit() { 
+    void JumpStop() { 
     
     }
+    // PlayerState.Move
+    void MoveStart() {
 
+    }
+    void MoveUpdate() {
+        PhysicsUpdate();
+    }
+    void MoveStop() {
+
+    }
 }

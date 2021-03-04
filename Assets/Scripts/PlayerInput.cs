@@ -20,5 +20,16 @@ public class PlayerInput : MonoBehaviour
         if (Input.GetKey(KeyCode.Space)) {
             _playerController.TryStateChange(PlayerController.PlayerState.Jump);
         }
+
+        Vector2 moveInput = Vector2.zero;
+        if (Input.GetKey(KeyCode.A)) {
+            moveInput = Vector2.left;
+        }
+        if (Input.GetKey(KeyCode.D)) {
+            moveInput = Vector2.right;
+        }
+
+        // all movements are valid movements! so well try this every frame
+        _playerController.TryStateChange(PlayerController.PlayerState.Move, moveInput);
     }
 }

@@ -32,7 +32,10 @@ public class PlatformBody : Body
     float _baseGravity = 0;
     float _downGravity = 0;
 
-    // 
+    // move variables
+    float _xDirection = 0;
+    float _targetVelocity = 0;
+    float _maxSpeed = 1f;
 
     void OnEnable()
     {
@@ -47,14 +50,14 @@ public class PlatformBody : Body
 
         _baseGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToJumpHeight, 2);
         _downGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToFall, 2);
+        _jumpVelocity = Mathf.Abs(_baseGravity) * _timeToJumpHeight;
     }
     public override void Jump() {
-        _jumpVelocity = Mathf.Abs(_currentGravity) * _timeToJumpHeight;
-        //Debug.Log(_jumpVelocity);
         _velocity.y = _jumpVelocity;
     }
     public override void Move(Vector2 direction) {
-
+        direction.x = direction.x * _maxSpeed * Time.deltaTime;
+        DoMovement(direction, false);
     }
     public override void DoGravity() {
         _currentGravity = _baseGravity;
@@ -79,22 +82,25 @@ public class PlatformBody : Body
             _hitBufferList.Clear();
             for (int i = 0; i <count; i++) {
                 _hitBufferList.Add(_hitBuffer[i]);
+            }
 
+            for(int i = 0; i < _hitBufferList.Count; i++) {
                 Vector2 currentNormal = _hitBufferList[i].normal;
 
                 // is this the ground or a wall?
                 // this will not handle sliding down slopes as is
-                if(currentNormal.y > minGroundNormalY) {
+                if (currentNormal.y > minGroundNormalY) {
                     _grounded = true;
-                    if(moveY) {
+                    if (moveY) {
                         _groundNormal = currentNormal;
                         currentNormal.x = 0;
+                        _velocity.y = 0;
                     }
                 }
 
                 // modify velocity if it is pushing into a collider
                 float projection = Vector2.Dot(_velocity, currentNormal);
-                if(projection < 0) {
+                if (projection < 0) {
                     _velocity = _velocity - projection * currentNormal;
                 }
 
@@ -102,16 +108,11 @@ public class PlatformBody : Body
                 distance = modifiedDistance < distance ? modifiedDistance : distance;
             }
 
-            for(int i = 0; i < _hitBufferList.Count; i++) {
-
-            }
-
             if(count > 0) {
-                //Debug.Log(count);
+
             }
         }
 
         _rb2d.position = _rb2d.position + move.normalized * distance;
-        
     }
 }
