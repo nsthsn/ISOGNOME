@@ -10,11 +10,13 @@ public class PlatformBody : Body
     protected float minGroundNormalY = .65f;
 
     // jump levers
-    float _jumpHeight = 2f;
-    float _timeToJumpHeight = .5f;
-    float _timeToFall = .1f;
+    float _jumpHeight = 6f;
+    float _timeToJumpHeight = .707f;
+    float _timeToFall = .499f;
 
     // move levers
+    float _changeMoveTotalTime = .25f;
+    float _maxSpeed = 14.07f;
 
     // control variables
     protected Vector2 _velocity = Vector2.zero;
@@ -33,9 +35,13 @@ public class PlatformBody : Body
     float _downGravity = 0;
 
     // move variables
-    float _xDirection = 0;
+    Vector2 _lastDirection = Vector2.zero; // use Vector2 for convenient access to lerp
+    Vector2 _targetDirection = Vector2.zero; // use Vector2 for convenient access to lerp
+    Vector2 _startDirection = Vector2.zero; // use Vector2 for convenient access to lerp
+    Vector2 _currentDirection = Vector2.zero;
     float _targetVelocity = 0;
-    float _maxSpeed = 1f;
+    float _changeMoveStartTime = 0;
+    float _changeMoveElapsedTime = 0;
 
     void OnEnable()
     {
@@ -56,8 +62,33 @@ public class PlatformBody : Body
         _velocity.y = _jumpVelocity;
     }
     public override void Move(Vector2 direction) {
-        direction.x = direction.x * _maxSpeed * Time.deltaTime;
-        DoMovement(direction, false);
+        //_xDirection = direction;
+
+        
+
+        _changeMoveElapsedTime += Time.deltaTime;
+
+        // if direction has changed we have a new target
+        if (_lastDirection != direction) {
+            _changeMoveElapsedTime = 0;
+            _startDirection = _currentDirection;
+            _targetDirection = direction;
+        }
+
+        float t = Mathf.Clamp(_changeMoveElapsedTime / _changeMoveTotalTime, 0, 1);
+
+        t = t * t * (3f - 2f * t);
+
+        _currentDirection = Vector2.Lerp(_startDirection, _targetDirection, Mathf.Abs(t));
+
+        _lastDirection = direction;
+
+        Vector2 nextDirection = _currentDirection * _maxSpeed * Time.deltaTime;
+
+        //Debug.Log(_velocity);
+        if(nextDirection != Vector2.zero) { Debug.Log(_targetDirection); }
+        
+        DoMovement(nextDirection, false);
     }
     public override void DoGravity() {
         _currentGravity = _baseGravity;
@@ -69,6 +100,7 @@ public class PlatformBody : Body
         Vector2 moveStep = ((_velocity + Vector2.up * _currentGravity * Time.deltaTime * 0.5f) * Time.deltaTime);
 
         _grounded = false;
+        moveStep.x = 0;
         DoMovement(moveStep, true);
 
         _velocity.y += _currentGravity * Time.deltaTime; 
