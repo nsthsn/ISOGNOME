@@ -11,12 +11,13 @@ public class PlatformBody : Body
 
     // jump levers
     float _jumpHeight = 6f;
-    float _timeToJumpHeight = .707f;
-    float _timeToFall = .499f;
+    float _timeToJumpHeight = .6f;
+    float _timeToFall = .4f;
+    //float _groundGravity = .1f;
 
     // move levers
-    float _changeMoveTotalTime = 3.25f;
-    float _maxSpeed = 14.07f;
+    float _changeMoveTotalTime = .3f;
+    float _maxSpeed = 14.14f;
 
     // control variables
     protected Vector2 _velocity = Vector2.zero;
@@ -26,13 +27,15 @@ public class PlatformBody : Body
     protected ContactFilter2D _contactFilter;
     protected RaycastHit2D[] _hitBuffer = new RaycastHit2D[16];
     protected List<RaycastHit2D> _hitBufferList = new List<RaycastHit2D>(16);
-    protected Vector2 _groundNormal;
+    protected Vector2 _groundNormal = Vector2.one;
 
     // jump variables
     float _jumpVelocity = 0;
     float _currentGravity = 0;
     float _baseGravity = 0;
     float _downGravity = 0;
+    bool _wasGrounded = false;
+    bool _firstJumpFrame = false;
 
     // move variables
     Vector2 _lastDirection = Vector2.zero; // use Vector2 for convenient access to lerp
@@ -56,15 +59,15 @@ public class PlatformBody : Body
 
         _baseGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToJumpHeight, 2);
         _downGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToFall, 2);
+        //_groundGravity = -(2 * _jumpHeight) / Mathf.Pow(_groundGravity, 2);
+
         _jumpVelocity = Mathf.Abs(_baseGravity) * _timeToJumpHeight;
     }
     public override void Jump() {
         _velocity.y = _jumpVelocity;
+        _firstJumpFrame = true;
     }
     public override void Move(Vector2 direction) {
-        //_xDirection = direction;
-
-        
 
         _changeMoveElapsedTime += Time.deltaTime;
 
@@ -85,8 +88,12 @@ public class PlatformBody : Body
 
         Vector2 nextDirection = _currentDirection * _maxSpeed * Time.deltaTime;
 
-        //Debug.Log(_velocity);
-        if(nextDirection != Vector2.zero) { Debug.Log(_targetDirection); }
+        Vector2 moveAlongGround = new Vector2(_groundNormal.y, -_groundNormal.x);
+
+        Debug.Log("first " + nextDirection);
+        nextDirection = nextDirection.x * moveAlongGround;
+        Debug.Log("second" + nextDirection);
+        //if (nextDirection != Vector2.zero) { Debug.Log(_targetDirection); }
         
         DoMovement(nextDirection, false);
     }
@@ -95,7 +102,18 @@ public class PlatformBody : Body
 
         if(_velocity.y < 0 && !_grounded) {
             _currentGravity = _downGravity;
-        }
+        } 
+        //else if(_grounded) {
+        //    _currentGravity = _groundGravity;
+        //}
+
+        // kind of heinous - a better method for down ramps would be great
+        // however it will affect ALL walking off of platforms
+        //if(_wasGrounded && !_grounded && !_firstJumpFrame) {
+        //    _velocity.y = -(_groundGravity / _downGravity) *_groundNormal.y;
+        //}
+        //_firstJumpFrame = false;
+        //_wasGrounded = Grounded;
 
         Vector2 moveStep = ((_velocity + Vector2.up * _currentGravity * Time.deltaTime * 0.5f) * Time.deltaTime);
 
@@ -103,7 +121,7 @@ public class PlatformBody : Body
         moveStep.x = 0;
         DoMovement(moveStep, true);
 
-        _velocity.y += _currentGravity * Time.deltaTime; 
+        _velocity.y += _currentGravity * Time.deltaTime;
     }
 
     void DoMovement(Vector2 move, bool moveY) {
@@ -138,10 +156,6 @@ public class PlatformBody : Body
 
                 float modifiedDistance = _hitBufferList[i].distance - _shellRadius;
                 distance = modifiedDistance < distance ? modifiedDistance : distance;
-            }
-
-            if(count > 0) {
-
             }
         }
 

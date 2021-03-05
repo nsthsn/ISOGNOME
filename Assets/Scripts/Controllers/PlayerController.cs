@@ -67,8 +67,8 @@ public class PlayerController : MonoBehaviour
     }
     // MovementUpdate
     void PhysicsUpdate() {
-        _body.DoGravity();
         _body.Move(_moveInput);
+        _body.DoGravity();
     }
 
     //PlayerState.Idle
