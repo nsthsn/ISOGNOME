@@ -15,7 +15,7 @@ public class PlatformBody : Body
     float _timeToFall = .499f;
 
     // move levers
-    float _changeMoveTotalTime = .25f;
+    float _changeMoveTotalTime = 3.25f;
     float _maxSpeed = 14.07f;
 
     // control variables
