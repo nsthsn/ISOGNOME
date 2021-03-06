@@ -34,8 +34,8 @@ public class PlatformBody : Body
     float _currentGravity = 0;
     float _baseGravity = 0;
     float _downGravity = 0;
-    bool _wasGrounded = false;
-    bool _firstJumpFrame = false;
+    //bool _wasGrounded = false;
+    //bool _firstJumpFrame = false;
 
     // move variables
     Vector2 _lastDirection = Vector2.zero; // use Vector2 for convenient access to lerp
@@ -59,13 +59,13 @@ public class PlatformBody : Body
 
         _baseGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToJumpHeight, 2);
         _downGravity = -(2 * _jumpHeight) / Mathf.Pow(_timeToFall, 2);
-        //_groundGravity = -(2 * _jumpHeight) / Mathf.Pow(_groundGravity, 2);
 
         _jumpVelocity = Mathf.Abs(_baseGravity) * _timeToJumpHeight;
     }
     public override void Jump() {
-        _velocity.y = _jumpVelocity;
-        _firstJumpFrame = true;
+        if (_grounded) {
+            _velocity.y = _jumpVelocity;
+        }
     }
     public override void Move(Vector2 direction) {
 
@@ -90,10 +90,8 @@ public class PlatformBody : Body
 
         Vector2 moveAlongGround = new Vector2(_groundNormal.y, -_groundNormal.x);
 
-        Debug.Log("first " + nextDirection);
+        // modify direction by normal to handle slopes
         nextDirection = nextDirection.x * moveAlongGround;
-        Debug.Log("second" + nextDirection);
-        //if (nextDirection != Vector2.zero) { Debug.Log(_targetDirection); }
         
         DoMovement(nextDirection, false);
     }
@@ -103,17 +101,7 @@ public class PlatformBody : Body
         if(_velocity.y < 0 && !_grounded) {
             _currentGravity = _downGravity;
         } 
-        //else if(_grounded) {
-        //    _currentGravity = _groundGravity;
-        //}
 
-        // kind of heinous - a better method for down ramps would be great
-        // however it will affect ALL walking off of platforms
-        //if(_wasGrounded && !_grounded && !_firstJumpFrame) {
-        //    _velocity.y = -(_groundGravity / _downGravity) *_groundNormal.y;
-        //}
-        //_firstJumpFrame = false;
-        //_wasGrounded = Grounded;
 
         Vector2 moveStep = ((_velocity + Vector2.up * _currentGravity * Time.deltaTime * 0.5f) * Time.deltaTime);
 
