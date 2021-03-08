@@ -1,18 +1,35 @@
-﻿using System.Collections;
+﻿
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Gamelogic.Extensions;
 
+/// <summary>
+/// SRP : Manages hitting hurtboxes.
+/// </summary>
 public class Hitbox : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [Flags]
+    public enum HitState
     {
-        
+        Hitting,
+        Inactive
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    Collider2D _collider;
+
+    protected StateMachine<HitState> _hitFSM = new StateMachine<HitState>();
+    private void Start() {
+        _hitFSM.AddState(HitState.Hitting, null, null, null);
+        _hitFSM.AddState(HitState.Inactive, null, null, null);
+
+        _hitFSM.CurrentState = HitState.Inactive;
+    }
+    private void FixedUpdate() {
+        _hitFSM.Update();
+    }
+    void CheckHits() {
+
     }
 }

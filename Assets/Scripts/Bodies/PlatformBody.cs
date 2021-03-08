@@ -13,7 +13,6 @@ public class PlatformBody : Body
     float _jumpHeight = 6f;
     float _timeToJumpHeight = .6f;
     float _timeToFall = .4f;
-    //float _groundGravity = .1f;
 
     // move levers
     float _changeMoveTotalTime = .3f;
@@ -34,8 +33,6 @@ public class PlatformBody : Body
     float _currentGravity = 0;
     float _baseGravity = 0;
     float _downGravity = 0;
-    //bool _wasGrounded = false;
-    //bool _firstJumpFrame = false;
 
     // move variables
     Vector2 _lastDirection = Vector2.zero; // use Vector2 for convenient access to lerp
@@ -67,7 +64,7 @@ public class PlatformBody : Body
             _velocity.y = _jumpVelocity;
         }
     }
-    public override void Move(Vector2 direction) {
+    public override void Move(Vector2 direction, bool yMove = false) {
 
         _changeMoveElapsedTime += Time.deltaTime;
 
@@ -93,7 +90,7 @@ public class PlatformBody : Body
         // modify direction by normal to handle slopes
         nextDirection = nextDirection.x * moveAlongGround;
         
-        DoMovement(nextDirection, false);
+        DoMovement(nextDirection, yMove);
     }
     public override void DoGravity() {
         _currentGravity = _baseGravity;

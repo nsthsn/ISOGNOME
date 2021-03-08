@@ -18,7 +18,6 @@ public class PlayerController : MonoBehaviour
         Move,
         Jump
     };
-
     StateMachine<PlayerState> _playerState = new StateMachine<PlayerState>();
     Body _body;
 
