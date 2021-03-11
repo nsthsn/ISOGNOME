@@ -4,19 +4,17 @@ using UnityEngine;
 
 public class PlatformBody : Body
 {
+
+
     // collision levers
     protected float _minMoveDistance = .001f;
     protected float _shellRadius = .01f;
-    protected float minGroundNormalY = .65f;
+    public  float minGroundNormalY = .65f;
 
     // jump levers
-    float _jumpHeight = 6f;
-    float _timeToJumpHeight = .6f;
-    float _timeToFall = .4f;
-
-    // move levers
-    float _changeMoveTotalTime = .3f;
-    float _maxSpeed = 14.14f;
+    protected float _jumpHeight = 12f;
+    protected float _timeToJumpHeight = .6f;
+    protected float _timeToFall = .4f;
 
     // control variables
     protected Vector2 _velocity = Vector2.zero;
@@ -64,7 +62,7 @@ public class PlatformBody : Body
             _velocity.y = _jumpVelocity;
         }
     }
-    public override void Move(Vector2 direction, bool yMove = false) {
+    public override void Move(Vector2 direction) {
 
         _changeMoveElapsedTime += Time.deltaTime;
 
@@ -88,9 +86,9 @@ public class PlatformBody : Body
         Vector2 moveAlongGround = new Vector2(_groundNormal.y, -_groundNormal.x);
 
         // modify direction by normal to handle slopes
-        nextDirection = nextDirection.x * moveAlongGround;
+        nextDirection = nextDirection * moveAlongGround;
         
-        DoMovement(nextDirection, yMove);
+        DoMovement(nextDirection, false);
     }
     public override void DoGravity() {
         _currentGravity = _baseGravity;
@@ -115,7 +113,7 @@ public class PlatformBody : Body
         if(distance >= _minMoveDistance) {
             int count = _rb2d.Cast(move, _contactFilter, _hitBuffer, distance + _shellRadius);
             _hitBufferList.Clear();
-            for (int i = 0; i <count; i++) {
+            for (int i = 0; i < count; i++) {
                 _hitBufferList.Add(_hitBuffer[i]);
             }
 

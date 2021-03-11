@@ -28,6 +28,9 @@ public class PlayerInput : MonoBehaviour
         if (Input.GetKey(KeyCode.D)) {
             moveInput = Vector2.right;
         }
+        if (Input.GetKey(KeyCode.W)) {
+            _playerController.TryStateChange(PlayerController.PlayerState.Attack);
+        }
 
         // all movements are valid movements! so well try this every frame
         _playerController.TryStateChange(PlayerController.PlayerState.Move, moveInput);

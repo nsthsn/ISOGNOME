@@ -11,25 +11,17 @@ using Gamelogic.Extensions;
 public class Hitbox : MonoBehaviour
 {
     [Flags]
-    public enum HitState
+    enum HurtState
     {
-        Hitting,
-        Inactive
+        Hittable,
+        Immune
     }
 
-    Collider2D _collider;
+    public delegate void HitEvent();
+    public event HitEvent Publish;
 
-    protected StateMachine<HitState> _hitFSM = new StateMachine<HitState>();
-    private void Start() {
-        _hitFSM.AddState(HitState.Hitting, null, null, null);
-        _hitFSM.AddState(HitState.Inactive, null, null, null);
-
-        _hitFSM.CurrentState = HitState.Inactive;
-    }
-    private void FixedUpdate() {
-        _hitFSM.Update();
-    }
-    void CheckHits() {
-
+    public void Hit() {
+        Publish?.Invoke();
+        //Debug.Log(Publish.);
     }
 }

@@ -19,12 +19,14 @@ public class StarController : MonoBehaviour
     Seeker _seeker;
     Rigidbody2D _rb;
 
-    float speed = 2;
-    float nextWaypointDistance = 3;
+    float speed = 12;
+    float nextWaypointDistance = 1.5f;
 
     Path _path;
     int _currentWaypoint = 0;
     bool _reachedEnd = false;
+
+    Hitbox _hb;
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +38,8 @@ public class StarController : MonoBehaviour
         _seeker.StartPath(transform.position, _target.position, OnPathComplete);
 
         InvokeRepeating("UpdatePath", 0, .5f);
+        _hb = GetComponentInChildren<Hitbox>();
+        _hb.Publish += HandleHit;
     }
     // Update is called once per frame
     void FixedUpdate()
@@ -51,13 +55,11 @@ public class StarController : MonoBehaviour
         }
 
         Vector2 direction = ((_path.vectorPath[_currentWaypoint] - transform.position)).normalized;
-        //Vector2 force = direction * speed * Time.deltaTime;
-        Debug.Log(direction);
+        direction = direction * speed * Time.deltaTime;
+        //Debug.Log(direction);
         // we call move twice since this object moves on y
-        _body.Move(direction, true);
-        _body.Move(direction);
         
-
+        _body.Move(direction );
 
         float distance = Vector2.Distance(transform.position, _path.vectorPath[_currentWaypoint]);
 
@@ -75,5 +77,9 @@ public class StarController : MonoBehaviour
             _path = p;
             _currentWaypoint = 0;
         }
+    }
+    void HandleHit() {
+        Debug.Log("deaeaeath");
+        Destroy(gameObject);
     }
 }
